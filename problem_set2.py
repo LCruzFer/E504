@@ -1,4 +1,3 @@
-from bokeh.io.output import output_notebook
 import numpy as np 
 import pandas as pd 
 import os 
@@ -24,7 +23,7 @@ countries = ['Uruguay', 'Venezuela', 'Brazil', 'Argentina', 'Mexico', 'Peru', 'I
                 'Bangladesh', 'Pakistan', 'Puerto Rico', 'Chile', 'Poland', 'Australia', 
                 'China', 'Dom Rep', 'Spain', 'USA', 'Philippines', 'Lithuania', 'Slovenia', 'Russia', 
                 'Moldova', 'S. Africa', 'S. Korea', 'Bulgaria', 'Switzerland',  'Germany', 'Macedonia',
-                'Finland', 'Sweden', 'Estonia', 'Taiwan', 'Latvia', 'Croatia', 'Norway', 'Bosnia', 
+                'Finland', 'Sweden', 'Estonia', 'Taiwan ROC', 'Latvia', 'Croatia', 'Norway', 'Bosnia', 
                 'Nigeria', 'Serbia', 'Armenia', 'Ukraine', 'Azerbaijan', 'Belarus', 'Georgia', 
                 'Montenegro', 'Japan']
 c_codes = [858, 862, 76, 32, 484, 604, 356, 792, 50, 586, 630, 152, 616, 36, 156, 
@@ -35,7 +34,7 @@ c_dict = {i: j for i, j in zip(c_codes, countries)}
 #Mayda and Rodrik use data from 1995 - 1997
 year = [1995, 1996, 1997]
 
-#now drop everythin that we are not interested in 
+#now drop everything that we are not interested in 
 wvs_oi = wvs[wvs['V238'].isin(year)].reset_index(drop = True)
 #wvs_oi = wvs_oi[wvs_oi['V2'].isin(c_codes)].reset_index(drop = True)
 #also, we only need one variable, keep country identifier and this variable 
@@ -50,30 +49,3 @@ table['countries'] = table.set_index('V2').index.map(c_dict.get)
 table = table.sort_values('protrade')
 print(table)
 #!!!there are some countries missing here somehow!!!
-
-#*##############################
-#! Q2 b) - Alvaredo et al. (2013) Figure 2 
-#*##############################
-
-income = pd.read_csv('data/Alvaredoetal_Fig2_countries.csv', sep = ';').reset_index()
-income.columns = income.iloc[0, :]
-income = income.drop(0).reset_index(drop = True)
-income = income.drop('Percentile', axis = 1)
-income['Year'] = income['Year'].astype(int)
-#rename columns
-new_colnames = ['US', 'CA', 'AUS', 'UK']
-income = income.rename(columns = {i:j for i, j in zip(income.columns[2:], new_colnames)})
-#convert values into floats (there are NaN)
-for i in new_colnames:
-    income[i] = income[i].astype(float)
-#get only data until 2010 (used in Alvaredo et al)
-income_oi = income[income['Year'] <= 2010]
-
-#now plot 
-output_notebook()
-ys = new_colnames
-source = CDS(data = dict{x = list(income_oi['Year'], y1 = list(income_oi['US'], 
-                            y2 = list(income_oi['CA'])))})
-p = figure(plot_width = 800, plot_height = 500)
-p.vline_stack(ys, x = 'Year', source = source)
-show(p)
