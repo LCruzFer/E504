@@ -47,5 +47,6 @@ var_oi['protrade'][var_oi['V133'] == -1] = 0
 table = var_oi.groupby('V2').mean().reset_index().drop('V133', axis = 1)
 table['countries'] = table.set_index('V2').index.map(c_dict.get)
 table = table.sort_values('protrade')
+table.to_csv('Output/replica.csv')
 print(table)
 #!!!there are some countries missing here somehow!!!
